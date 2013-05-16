@@ -13,4 +13,20 @@
 		<servlet-name>updateBusiness</servlet-name>
 		<url-pattern>/yelp/data/business/update</url-pattern>
 	</servlet-mapping>  
+	<servlet>
+		<servlet-name>loadBusiness</servlet-name>
+		<servlet-class>open.source.kaggle.yelp.PutBusinessDataInSessionServlet</servlet-class>
+	</servlet>		
+	<servlet-mapping>
+		<servlet-name>loadBusiness</servlet-name>
+		<url-pattern>/yelp/data/business/load</url-pattern>
+	</servlet-mapping>  
+			<servlet>
+		<servlet-name>findBusiness</servlet-name>
+		<servlet-class>open.source.kaggle.yelp.FindBusinessServlet</servlet-class>
+	</servlet>		
+	<servlet-mapping>
+		<servlet-name>findBusiness</servlet-name>
+		<url-pattern>/yelp/data/business/find</url-pattern>
+	</servlet-mapping>  
 </web-app>
