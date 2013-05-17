@@ -1,8 +1,11 @@
 package open.source.kaggle.yelp;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -18,13 +21,21 @@ import com.eclipsesource.json.JsonObject;
 public class FindBusinessServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
-
+	public static JsonArray fetchData() throws FileNotFoundException {
+		Scanner sc = new Scanner(new File(
+				"data/yelp/yelp_training_set_business.json"));
+		StringBuilder sb = new StringBuilder();
+		while (sc.hasNext()) {
+			sb.append(sc.nextLine());
+		}
+		JsonArray array = JsonArray.readFrom(sb.toString());
+		return array;
+	}
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
 		resp.setContentType("application/json; charset=utf-8");
 		resp.setHeader("Cache-Control", "no-cache");
-		JsonArray array=(JsonArray) req.getSession().getAttribute(PutBusinessDataInSessionServlet.KIND);
-		resp.getWriter().write("{\"status\":+" + array.size() + "}");
+		JsonArray array=fetchData();
 		Double miny=Double.valueOf(req.getParameter("lat1"));
 		Double maxy=Double.valueOf(req.getParameter("lat2"));
 		Double minx=Double.valueOf(req.getParameter("lon1"));
@@ -34,7 +45,7 @@ public class FindBusinessServlet extends HttpServlet {
 		for(int i=0;i<array.size();i++) {
 			points.add(new BusinessPoints(array.get(i).asObject()));
 		}
-		Boundary boundary=new Boundary(minx, maxx, miny, maxy);
+		Boundary boundary=new Boundary(minx, maxx, miny, maxy);			
 		List<ClusterPoint> result = new GridClusterAlgorithm().getClusteredMarkers(points, boundary, zoomLevel);
 		JsonArray arrayOut=new JsonArray();
 		for(ClusterPoint point:result) {
@@ -46,46 +57,5 @@ public class FindBusinessServlet extends HttpServlet {
 			arrayOut.add(markerObject);
 		}
 		resp.getWriter().write(arrayOut.toString());
-	}
-	static class BusinessPoints extends ClusterPoint {
-		private JsonObject object;		
-		
-		public BusinessPoints(JsonObject object) {
-			super();
-			this.object = object;
-		}
-
-		@Override
-		public double getX() {
-			return object.get("longitude").asDouble();
-		}
-
-		@Override
-		public double getY() {
-			return object.get("latitude").asDouble();
-		}
-
-		@Override
-		public void setX(double arg0) {
-			object.add("longitude",Double.valueOf(arg0));
-		}
-
-		@Override
-		public void setY(double arg0) {
-			object.add("latitude",arg0);
-		}
-		public String getName() {
-			return object.get("name").asString();
-		}
-		public String getAddress() {
-			return object.get("full_address").asString();
-		}
-		public String getMarkerLabel() {
-			if(this.isClusterPoint()) {
-				return String.valueOf(this.getCountCluster());
-			}
-			return this.getName();
-		}
-	}
-
+	}	
 }

@@ -47,7 +47,7 @@ public class UpdateBusinessServlet extends HttpServlet {
 				rows.add(rowEntity);
 			}
 		}
-		//datastore.put(rows);
+		datastore.put(rows);
 		resp.getWriter().write("{\"status\":+" + 2 + "}");
 	}
 
@@ -67,18 +67,18 @@ public class UpdateBusinessServlet extends HttpServlet {
 		for (String propertyName : json.names()) {
 			JsonValue value = json.get(propertyName);
 			try {
-				row.setProperty(propertyName, value.asBoolean());
+				row.setUnindexedProperty(propertyName, value.asBoolean());
 			} catch (Exception e) {
 				try {
-					row.setProperty(propertyName, value.asDouble());
+					row.setUnindexedProperty(propertyName, value.asDouble());
 				} catch (Exception e1) {
 					try {
-						row.setProperty(propertyName, value.asString());
+						row.setUnindexedProperty(propertyName, value.asString());
 					} catch (Exception e2) {
 						try {
-							row.setProperty(propertyName, value.asObject().toString());
+							row.setUnindexedProperty(propertyName, value.asObject().toString());
 						} catch (Exception e3) {
-							row.setProperty(propertyName, value.asArray().toString());
+							row.setUnindexedProperty(propertyName, value.asArray().toString());
 						}
 					}
 				}
